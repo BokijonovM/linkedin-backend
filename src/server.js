@@ -3,7 +3,7 @@ import cors from "cors";
 import profileRoutes from "./services/profiles/index.js";
 import mongoose from "mongoose";
 const server = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 server.use(cors());
 server.use(express.json());
 server.use("/profiles",profileRoutes)
