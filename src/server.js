@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import profileRoutes from "./services/posts/index.js";
+import profileRoutes from "./services/profiles/index.js";
 import mongoose from "mongoose";
 const server = express();
 const port = process.env.PORT || 3001;
