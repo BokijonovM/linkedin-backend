@@ -37,14 +37,14 @@ import { v2 as cloudinary } from "cloudinary";
 
 const postRouter = express.Router();
 
-// const cloudinaryUplpoad = multer({
-//     storage: new CloudinaryStorage({
-//         cloudinary,
-//         params:{
-//             folder: `buildweek3`
-//         }
-//     })
-// }).single("image")
+const cloudinaryUplpoad = multer({
+    storage: new CloudinaryStorage({
+        cloudinary,
+        params:{
+            folder: `buildweek3`
+        }
+    })
+}).single("image")
 
 postRouter.post("/", async (req, res, next) => {
   try {
@@ -123,5 +123,26 @@ postRouter.delete("/:postId", async (req, res, next) => {
     next(createHttpError(500, "internal server problem"));
   }
 });
+
+postRouter.put("/:postId/image", cloudinaryUplpoad, async(req,res,next)=>{
+    try {
+        const postId = req.params.postId;
+        const updatePost = await PostModel.findByIdAndUpdate(
+            postId, 
+            {image: req.file.path}, {
+                new: true
+            }
+        ) 
+        if (updatePost){
+res.status(200).send(updatePost)
+        } else {
+            next(createHttpError(404,`post with given ${postId} not found`))
+        }
+        
+    } catch (error) {
+        next(error)
+        
+    }
+})
 
 export default postRouter;
