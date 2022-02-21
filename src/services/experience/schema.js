@@ -18,5 +18,4 @@ const ExperienceSchema = new Schema(
   }
 );
 
-
 export default model("Experience", ExperienceSchema);

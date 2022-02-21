@@ -4,6 +4,7 @@ import createHttpError from "http-errors";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import fastCsv from "fast-csv";
 
 const cloudinaryUploader = multer({
   storage: new CloudinaryStorage({
@@ -111,5 +112,12 @@ expereincesRouter.post(
     }
   }
 );
+
+expereincesRouter.get("/csv", async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default expereincesRouter;
