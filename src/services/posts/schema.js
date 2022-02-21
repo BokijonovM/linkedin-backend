@@ -12,8 +12,8 @@ const profileSchema = new Schema(
     bio: { type: String, required: true },
     title: { type: String, required: true },
     area: { type: String, required: true },
-    image: { type: String, required:false },
-    userName: { type: String, required: true },
+    image: { type: String, required: true },
+    userName: { type: String, required: true, unique: true },
   },
   {
     timestamps: true,
