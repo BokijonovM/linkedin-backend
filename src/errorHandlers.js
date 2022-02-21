@@ -35,7 +35,7 @@ export const genericErrorHandler = (err, req, res, next) => {
     } else {
       next(err)
     }
-  }
+  
   
   export const unauthorizedHandler = (err, req, res, next) => {
     if (err.status === 401) {
