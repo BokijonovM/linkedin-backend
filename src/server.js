@@ -1,37 +1,16 @@
 import express from "express";
-import listEndpoints from "express-list-endpoints";
 import cors from "cors";
+import profileRoutes from "./services/profiles/index.js";
 import mongoose from "mongoose";
-import {
-  badRequestHandler,
-  unauthorizedHandler,
-  notFoundHandler,
-  genericErrorHandler,
-} from "./errorHandlers.js";
-import expereincesRouter from "./services/experience/model.js";
-import postRouter from "./services/postmode/index.js";
-
 const server = express();
-const port = process.env.PORT || 3001;
-
+const port = process.env.PORT || 3002;
 server.use(cors());
 server.use(express.json());
-
-server.use("/profile", expereincesRouter);
-
-server.use("/posts", postRouter);
-
-server.use(badRequestHandler);
-server.use(unauthorizedHandler);
-server.use(notFoundHandler);
-server.use(genericErrorHandler);
-
-mongoose.connect(process.env.MONGO_CONNECTION);
-
-mongoose.connection.on("connected", () => {
-  console.log("Successfully connected to Mongo!");
+server.use("/profiles",profileRoutes)
+ mongoose.connect(process.env.MONGO_CONNECTION);
+ mongoose.connection.on("connected", () => {
+      console.log("connected to mongo");
   server.listen(port, () => {
-    console.table(listEndpoints(server));
-    console.log("Server runnning on port: ", port);
+    console.log("server is running on port", port);
   });
-});
+ });
