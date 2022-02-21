@@ -7,11 +7,18 @@ export const badRequestHandler = (err, req, res, next) => {
   }
 };
 
-
 export const notFoundHandler = (err, req, res, next) => {
   if (err.status === 404) {
     console.log("I am the not found handler", err);
     res.status(404).send({ message: err.message });
+  } else {
+    next(err);
+  }
+};
+export const unauthorizedHandler = (err, req, res, next) => {
+  if (err.status === 401) {
+    console.log("I am the not found handler", err);
+    res.status(401).send({ message: err.message });
   } else {
     next(err);
   }
