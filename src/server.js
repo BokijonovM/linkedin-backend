@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors"
 
 
-import { badRequestHandler, unauthorizedHandler,notFoundHandler, genericErrorHandler } from "./errorHandlers.js";
+import { badRequestHandler, unauthorizedHandler,notFoundHandler, genericErrorHandler } from "./errorHandlers.js"
 
 const server = express()
 
