@@ -5,11 +5,9 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import json2csv from "json2csv";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { join } from "path";
 import fs from "fs-extra";
 import { pipeline } from "stream";
-import experience from "./csv.js";
 
 const { createReadStream, writeJSON } = fs;
 
@@ -122,7 +120,45 @@ expereincesRouter.post(
     }
   }
 );
+expereincesRouter.get("/experiences/:_id/CSV", async (req, res, next) => {
+  try {
+    const _id = req.params._id;
+    const profile = await ExperiencesModel.findById({ _id });
+    const experienceJSONPath = join(process.cwd(), `./src/data/${_id}.csv`);
+    // console.log(experienceJSONPath);
+    await writeJSON(experienceJSONPath, profile);
 
-expereincesRouter.route("/experiences/:_id/CSV").get(experience.getExpCSV);
+    const filename = `${_id}.csv`;
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+    const source = createReadStream(experienceJSONPath);
+    const transform = new json2csv.Transform({
+      fields: [
+        "role",
+        "company",
+        "startDate",
+        "endDate",
+        "description",
+        "area",
+        "username",
+        "image",
+      ],
+    });
+    const destination = res;
+
+    pipeline(source, transform, destination, (err) => {
+      if (err) {
+        console.log("Error!!!!");
+      }
+    });
+
+    // res.status(200).send()
+  } catch (error) {
+    next(
+      createHttpError(400, "Some errors occurred in request body!", {
+        message: error.message,
+      })
+    );
+  }
+});
 
 export default expereincesRouter;
