@@ -4,7 +4,14 @@ import createHttpError from "http-errors";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import fastCsv from "fast-csv";
+import json2csv from "json2csv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import fs from "fs-extra";
+import { pipeline } from "stream";
+import experience from "./csv.js";
+
+const { createReadStream, writeJSON } = fs;
 
 const cloudinaryUploader = multer({
   storage: new CloudinaryStorage({
@@ -17,7 +24,7 @@ const cloudinaryUploader = multer({
 
 const expereincesRouter = express.Router();
 
-expereincesRouter.post("/", async (req, res, next) => {
+expereincesRouter.post("/experiences/", async (req, res, next) => {
   try {
     const newExperience = new ExperiencesModel(req.body);
     const { _id } = await newExperience.save();
@@ -27,7 +34,7 @@ expereincesRouter.post("/", async (req, res, next) => {
   }
 });
 
-expereincesRouter.get("/", async (req, res, next) => {
+expereincesRouter.get("/experiences/", async (req, res, next) => {
   try {
     const product = await ExperiencesModel.find();
     res.send(product);
@@ -36,7 +43,7 @@ expereincesRouter.get("/", async (req, res, next) => {
   }
 });
 
-expereincesRouter.get("/:experienceId", async (req, res, next) => {
+expereincesRouter.get("/experiences/:experienceId", async (req, res, next) => {
   try {
     const product = await ExperiencesModel.findById(req.params.experienceId);
     if (product) {
@@ -51,7 +58,7 @@ expereincesRouter.get("/:experienceId", async (req, res, next) => {
   }
 });
 
-expereincesRouter.put("/:experienceId", async (req, res, next) => {
+expereincesRouter.put("/experiences/:experienceId", async (req, res, next) => {
   try {
     const updated = await ExperiencesModel.findByIdAndUpdate(
       req.params.experienceId,
@@ -70,25 +77,28 @@ expereincesRouter.put("/:experienceId", async (req, res, next) => {
   }
 });
 
-expereincesRouter.delete("/:experienceId", async (req, res, next) => {
-  try {
-    const deleted = await ExperiencesModel.findByIdAndDelete(
-      req.params.experienceId
-    );
-    if (deleted) {
-      res.send("Experience deleted!");
-    } else {
-      res
-        .status(404)
-        .send(`Experience with id ${req.params.experienceId} not found!`);
+expereincesRouter.delete(
+  "/experiences/:experienceId",
+  async (req, res, next) => {
+    try {
+      const deleted = await ExperiencesModel.findByIdAndDelete(
+        req.params.experienceId
+      );
+      if (deleted) {
+        res.send("Experience deleted!");
+      } else {
+        res
+          .status(404)
+          .send(`Experience with id ${req.params.experienceId} not found!`);
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 expereincesRouter.post(
-  "/:experienceId/image",
+  "/experiences/:experienceId/image",
   cloudinaryUploader,
   async (req, res, next) => {
     try {
@@ -113,11 +123,6 @@ expereincesRouter.post(
   }
 );
 
-expereincesRouter.get("/csv", async (req, res, next) => {
-  try {
-  } catch (error) {
-    next(error);
-  }
-});
+expereincesRouter.route("/experiences/:_id/CSV").get(experience.getExpCSV);
 
 export default expereincesRouter;

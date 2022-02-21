@@ -16,7 +16,7 @@ const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(express.json());
 
-server.use("/experience", expereincesRouter);
+server.use("/profile", expereincesRouter);
 
 server.use(badRequestHandler);
 server.use(unauthorizedHandler);
