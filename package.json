@@ -1,0 +1,37 @@
+{
+  "name": "linkedin-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -r dotenv/config -e js ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BokijonovM/linkedin-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BokijonovM/linkedin-backend/issues"
+  },
+  "homepage": "https://github.com/BokijonovM/linkedin-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "express-list-endpoints": "^6.0.0",
+    "fs-extra": "^10.0.0",
+    "helmet": "^5.0.2",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "uniqid": "^5.4.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.15"
+  }
+}
