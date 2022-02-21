@@ -5,10 +5,15 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
+    "cloudinary": "^1.28.1",
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "express-list-endpoints": "^6.0.0",
-    "mongoose": "^6.2.2"
+    "http-errors": "^2.0.0",
+    "mongoose": "^6.2.2",
+    "multer": "^1.4.4",
+    "multer-storage-cloudinary": "^4.0.0",
+    "query-to-mongo": "^0.10.1"
   },
   "devDependencies": {
     "dotenv": "^16.0.0",
