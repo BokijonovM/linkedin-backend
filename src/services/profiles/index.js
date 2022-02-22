@@ -8,6 +8,8 @@ import json2csv from "json2csv";
 import { join } from "path";
 import fs from "fs-extra";
 import { pipeline } from "stream";
+import experience from "./exp.js";
+import lib from "../lib/index.js";
 
 const { createReadStream, writeJSON } = fs;
 
@@ -229,30 +231,46 @@ profileRouter.get("/:id/experiences/:_id/CSV", async (req, res, next) => {
   }
 });
 
-profileRouter.post(
-  "/:id/experiences/:_id/image",
-  cloudinaryUploader,
-  async (req, res, next) => {
-    try {
-      const experienceId = req.params._id;
-      const updated = await ProfilesModel.findByIdAndUpdate(
-        experienceId,
-        { image: req.file.path },
-        {
-          new: true,
-        }
-      );
-      if (updated) {
-        res.send(updated);
-      } else {
-        next(
-          createHttpError(404, `Experience with id ${experienceId} not found!`)
-        );
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+profileRouter
+  .route("/:_userId/experiences/:_id/image")
+  .put(
+    multer({ storage: lib.cloudStorage }).single("image"),
+    experience.uploadImage
+  );
+
+// profileRouter.post(
+//   "/:id/experiences/:expId/image",
+//   cloudinaryUploader,
+//   async (req, res, next) => {
+//     try {
+//       const experienceId = req.params.id;
+//       const updated = await ProfilesModel.findByIdAndUpdate(
+//         experienceId,
+//         { $push: { experiences: req.file.path } },
+//         //{ image: req.file.path },
+//         {
+//           new: true,
+//         }
+//       );
+//       if (updated) {
+//         res.send(updated);
+//       } else {
+//         next(
+//           createHttpError(404, `Experience with id ${experienceId} not found!`)
+//         );
+//       }
+//     } catch (error) {
+//       next(
+//         createHttpError(
+//           400,
+//           "Some errors occurred in profilerouter.get body!",
+//           {
+//             message: error.message,
+//           }
+//         )
+//       );
+//     }
+//   }
+// );
 
 export default profileRouter;
