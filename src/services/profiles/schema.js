@@ -26,7 +26,7 @@ const profileSchema = new Schema(
           type: String,
           unique: true,
           required: true,
-          // dropDups: true,
+          dropDups: true,
         },
         user: { type: Schema.Types.ObjectId, ref: "profile" },
         image: { type: String, required: true },
