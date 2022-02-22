@@ -9,8 +9,8 @@ import {
   genericErrorHandler,
 } from "./errorHandlers.js";
 import expereincesRouter from "./services/experience/model.js";
-import profileRouter from "./services/profiles/index";
-import postRouter from "./services/postmode/index";
+import profileRouter from "./services/profiles/index.js";
+import postRouter from "./services/postmode/index.js";
 
 const server = express();
 const port = process.env.PORT || 3001;
