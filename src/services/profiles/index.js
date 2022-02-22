@@ -27,7 +27,11 @@ profileRouter.post("/", async (req, res, next) => {
     const { _id } = await newProfile.save();
     res.status(201).send({ _id });
   } catch (error) {
-    next(error);
+    next(
+      createHttpError(400, "Some errors occurred in profilerouter.get body!", {
+        message: error.message,
+      })
+    );
   }
 });
 profileRouter.get("/:id", async (req, res, next) => {
