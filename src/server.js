@@ -8,7 +8,6 @@ import {
   notFoundHandler,
   genericErrorHandler,
 } from "./errorHandlers.js";
-import expereincesRouter from "./services/experience/model.js";
 import profileRouter from "./services/profiles/index.js";
 import postRouter from "./services/postmode/index.js";
 
@@ -18,7 +17,6 @@ const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(express.json());
 
-server.use("/profile", expereincesRouter);
 server.use("/profiles", profileRouter);
 server.use("/postMode", postRouter);
 
