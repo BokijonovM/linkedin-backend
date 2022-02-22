@@ -58,16 +58,10 @@ postRouter.post("/", async (req, res, next) => {
 
 postRouter.get("/", async (req, res, next) => {
   try {
-    const defaultQuery = {
-      sort: "price",
-      skip: 0,
-      limit: 15,
-    };
-    const query = { ...defaultQuery, ...req.query };
-    const mongoQeury = q2m(query);
-    const total = await PostModel.countDocuments(mongoQeury.criteria);
+    const mongoQuery = q2m(req.query);
+    const total = await PostModel.findPostsWithUser(mongoQuery);
 
-    const posts = await PostModel.find(mongoQeury.criteria)
+    const posts = await PostModel.find(mongoQuery.criteria)
       .populate({
         path: "user",
         select: ["_id", "firstName", "surName", "image"],
@@ -80,15 +74,47 @@ postRouter.get("/", async (req, res, next) => {
           select: ["author", "title"],
         },
       })
-      .sort(mongoQeury.options.sort)
-      .skip(mongoQeury.options.skip)
-      .limit(mongoQeury.limit);
-    res.status(200).send({
-      links: mongoQeury.links("/posts", total),
+      .sort(mongoQuery.options.sort)
+      .skip(mongoQuery.options.skip)
+      .limit(mongoQuery.limit);
+
+    res.send({
+      links: mongoQuery.links("/postMode", total),
       total,
-      titalPagess: Math.ceil(total / mongoQeury.options.limit),
+      totalPages: Math.ceil(total / mongoQuery.options.limit),
       posts,
     });
+    // const defaultQuery = {
+    //   sort: "price",
+    //   skip: 0,
+    //   limit: 15,
+    // };
+    // const query = { ...defaultQuery, ...req.query };
+    // const mongoQeury = q2m(query);
+    // const total = await PostModel.countDocuments(mongoQeury.criteria);
+
+    // const posts = await PostModel.find(mongoQeury.criteria)
+    //   .populate({
+    //     path: "user",
+    //     select: ["_id", "firstName", "surName", "image"],
+    //   })
+    //   .populate({
+    //     path: "comments",
+    //     populate: {
+    //       path: "user",
+    //       model: "Profile",
+    //       select: ["author", "title"],
+    //     },
+    //   })
+    //   .sort(mongoQeury.options.sort)
+    //   .skip(mongoQeury.options.skip)
+    //   .limit(mongoQeury.limit);
+    // res.status(200).send({
+    //   links: mongoQeury.links("/profiles", total),
+    //   total,
+    //   titalPagess: Math.ceil(total / mongoQeury.options.limit),
+    //   posts,
+    // });
   } catch (error) {
     next(error);
   }
