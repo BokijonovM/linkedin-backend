@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
+    "GridFS": "^0.3.0",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
@@ -17,7 +18,6 @@
     "fast-csv": "^4.3.6",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
-    "GridFS": "^0.3.0",
     "gridfs-stream": "^1.1.1",
     "helmet": "^5.0.2",
     "html-pdf": "^3.0.1",
