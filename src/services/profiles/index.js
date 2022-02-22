@@ -9,7 +9,8 @@ import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
 import path from "path";
-import { generateprofilePDF } from "./cv.js";
+// import { generateprofilePDF } from "./cv.js";
+import { createPDFReadableStream } from "./cv.js";
 
 import { createGzip } from "zlib";
 import { v2 as cloudinary } from "cloudinary";
@@ -91,23 +92,31 @@ profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
 
 profileRouter.get("/:id/pdf", async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const profile = ProfilesModel.findById(id);
-    const pdfStream = await generateprofilePDF(profile);
-    if (profile) {
-      res.setHeader("Content-Disposition", `attachment ; file-name=${profile._id}.pdf`);
-      pdfStream.pipe(res);
-      pdfStream.end();
-
-      const destination = res;
-      pipeline(pdfStream, destination, err => {
-        if(err){next(err)}
-      })
-    } else {
-      res.status(404).send(`profile with ${id} is not found!`);
-    }
+    const selectedBlogPost = await ProfilesModel.findById(req.params.id);
+    //create PDF readableStream
+    const source = await createPDFReadableStream(selectedBlogPost);
+    // set header
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${selectedBlogPost._id}.pdf`
+    );
+    // set destination
+    const destination = res;
+    pipeline(source, destination, (err) => {
+      if (err) {
+        next(err);
+      }
+    });
   } catch (error) {
-    next(error);
+    next(
+      createHttpError(
+        400,
+        "Some errors occurred in profileRouter.post experiences body!",
+        {
+          message: error.message,
+        }
+      )
+    );
   }
 });
 
