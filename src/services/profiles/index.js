@@ -20,7 +20,7 @@ const cloudinaryUpload = multer({
       folder: "posts",
     },
   }),
-});
+}).single("image");
 
 profileRouter.get("/", async (req, res, next) => {
   try {
@@ -69,12 +69,12 @@ profileRouter.put("/:id", async (req, res, next) => {
 });
 profileRouter.post(
   "/:id/image",
-  cloudinaryUpload.single("image"),
+  cloudinaryUpload,
   async (req, res, next) => {
     try {
       const updatedProfile = await ProfilesModel.findByIdAndUpdate(
         req.params.id,
-        { $push: { image: req.file.path } },
+         { image: req.file.path } ,
         { new: true }
       );
       if (updatedProfile) {
