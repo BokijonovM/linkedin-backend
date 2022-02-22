@@ -38,13 +38,13 @@ import { v2 as cloudinary } from "cloudinary";
 const postRouter = express.Router();
 
 const cloudinaryUplpoad = multer({
-    storage: new CloudinaryStorage({
-        cloudinary,
-        params:{
-            folder: `buildweek3`
-        }
-    })
-}).single("image")
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: `buildweek3`,
+    },
+  }),
+}).single("image");
 
 postRouter.post("/", async (req, res, next) => {
   try {
@@ -124,25 +124,132 @@ postRouter.delete("/:postId", async (req, res, next) => {
   }
 });
 
-postRouter.put("/:postId/image", cloudinaryUplpoad, async(req,res,next)=>{
-    try {
-        const postId = req.params.postId;
-        const updatePost = await PostModel.findByIdAndUpdate(
-            postId, 
-            {image: req.file.path}, {
-                new: true
-            }
-        ) 
-        if (updatePost){
-res.status(200).send(updatePost)
-        } else {
-            next(createHttpError(404,`post with given ${postId} not found`))
-        }
-        
-    } catch (error) {
-        next(error)
-        
+postRouter.put("/:postId/image", cloudinaryUplpoad, async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const updatePost = await PostModel.findByIdAndUpdate(
+      postId,
+      { image: req.file.path },
+      {
+        new: true,
+      }
+    );
+    if (updatePost) {
+      res.status(200).send(updatePost);
+    } else {
+      next(createHttpError(404, `post with given ${postId} not found`));
     }
-})
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.post("/:postId/comments", async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const newComment = { ...req.body };
+
+    const post = await PostModel.findByIdAndUpdate(postId);
+
+    if (post) {
+      const modifyPost = await PostModel.findByIdAndUpdate(
+        postId,
+        { $push: { comments: newComment } },
+        { new: true }
+      );
+      res.status(201).send(modifyPost);
+    } else {
+      next(createHttpError(404, ` Nothing to comment`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.get("/:postId/comments", async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const post = await PostModel.findById(postId);
+    if (post) {
+      res.send(post.comments);
+    } else {
+      next(
+        createHttpError(404, `Post with Id ${req.params.postId} doesn't exist`)
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.get("/:postId/comments/:commentId", async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const post = await PostModel.findById(postId);
+    if (post) {
+      const comment = post.comments.find(
+        (c) => c._id.toString() === req.params.commentId
+      );
+      if (comment) {
+        res.send(comment);
+      } else {
+        next(createHttpError(404, `Id ${req.params.commentId} not found`));
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+postRouter.delete("/:postId/comments/:commentId", async (req, res, next) => {
+  try {
+    const modifiedPost = await PostModel.findByIdAndUpdate(
+      req.params.postId,
+      { $pull: { comments: { _id: req.params.commentId } } },
+      { new: true }
+    );
+    if (modifiedPost) {
+      res.status(204).send();
+    } else {
+      {
+        next(createHttpError(404, `Id ${req.params.commentId} not found`));
+      }
+    }
+  } catch (error) {}
+});
+
+postRouter.put("/:postId/comments/:commentId", async (req, res, next) => {
+  try {
+    const post = await PostModel.findById(req.params.postId);
+    if (post) {
+      const index = post.comments.findIndex(
+        (c) => c._id.toString() === req.params.commentId
+      );
+
+      if (index !== -1) {
+        post.comments[index] = {
+          ...post.comments[index].toObject(),
+          ...req.body,
+        };
+
+        await post.save();
+        res.send(post);
+      } else {
+        next(
+          createHttpError(
+            404,
+            `Comment with id ${req.params.commentId} not found!`
+          )
+        );
+      }
+    } else {
+      next(
+        createHttpError(404, `Post with id ${req.params.postId} not found!`)
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default postRouter;
