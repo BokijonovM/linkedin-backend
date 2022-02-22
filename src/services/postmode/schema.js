@@ -39,6 +39,11 @@ const PostSchema = new Schema(
       image: { type: String, required: true },
       username: { type: String, required: true },
     },
+    comments: [{
+      author: {type:String, required:false},
+      title: {type: String, required:true}
+    
+    }]
   },
   { timestamps: true }
 );
