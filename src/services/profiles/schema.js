@@ -13,7 +13,28 @@ const profileSchema = new Schema(
     title: { type: String, required: true },
     area: { type: String, required: true },
     image: { type: String, required: true },
-    username: { type: String, required: true ,unique:true,dropDups: true},
+    username: { type: String, required: true, unique: true, dropDups: true },
+    experiences: [
+      {
+        role: { type: String, required: true },
+        company: { type: String, required: true },
+        startDate: { type: Date, required: true },
+        endDate: { type: Date, required: false },
+        description: { type: String, required: true },
+        area: { type: String, required: true },
+        username: {
+          type: String,
+          unique: true,
+          required: true,
+          // dropDups: true,
+        },
+        user: { type: Schema.Types.ObjectId, ref: "profile" },
+        image: { type: String, required: true },
+      },
+      {
+        timestamps: true,
+      },
+    ],
   },
   {
     timestamps: true,

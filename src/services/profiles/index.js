@@ -50,4 +50,50 @@ profileRouter.put("/:id", async (req, res, next) => {
   }
 });
 
+////////////////////////////////
+////////// experiences /////////
+////////////////////////////////
+
+profileRouter.get("/:id/experiences", async (req, res, next) => {
+  try {
+    const user = await ProfilesModel.findById(req.params.id);
+    if (user) {
+      res.send(user.experiences);
+    } else {
+      next(createHttpError(404, `Profile with Id ${req.params.id} not found!`));
+    }
+  } catch (error) {
+    next(
+      createHttpError(400, "Some errors occurred in profilerouter.get body!", {
+        message: error.message,
+      })
+    );
+  }
+});
+
+profileRouter.post("/:id/experiences", async (req, res, next) => {
+  try {
+    const updatedProfile = await ProfilesModel.findByIdAndUpdate(
+      req.params.id,
+      { $push: { experiences: req.body } },
+      { new: true }
+    );
+    if (updatedProfile) {
+      res.send(updatedProfile);
+    } else {
+      next(createHttpError(404, `Author with id ${req.params.id} not found!`));
+    }
+  } catch (error) {
+    next(
+      createHttpError(
+        400,
+        "Some errors occurred in profileRouter.post experiences body!",
+        {
+          message: error.message,
+        }
+      )
+    );
+  }
+});
+
 export default profileRouter;
