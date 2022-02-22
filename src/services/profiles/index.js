@@ -8,6 +8,10 @@ import fs from "fs-extra";
 import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
+import path from "path";
+import { generateprofilePDF } from "./cv.js";
+
+import { createGzip } from "zlib";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
@@ -30,6 +34,7 @@ profileRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
+
 profileRouter.post("/", async (req, res, next) => {
   try {
     const newProfile = new ProfilesModel(req.body);
@@ -67,26 +72,45 @@ profileRouter.put("/:id", async (req, res, next) => {
     next(error);
   }
 });
-profileRouter.post(
-  "/:id/image",
-  cloudinaryUpload,
-  async (req, res, next) => {
-    try {
-      const updatedProfile = await ProfilesModel.findByIdAndUpdate(
-        req.params.id,
-         { image: req.file.path } ,
-        { new: true }
-      );
-      if (updatedProfile) {
-        res.status(200).send(updatedProfile);
-      } else {
-        next(createHttpError(404, `profile with given ${id} not found`));
-      }
-    } catch (error) {
-      next(error);
+profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
+  try {
+    const updatedProfile = await ProfilesModel.findByIdAndUpdate(
+      req.params.id,
+      { image: req.file.path },
+      { new: true }
+    );
+    if (updatedProfile) {
+      res.status(200).send(updatedProfile);
+    } else {
+      next(createHttpError(404, `profile with given ${id} not found`));
     }
+  } catch (error) {
+    next(error);
   }
-);
+});
+
+profileRouter.get("/:id/pdf", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const profile = ProfilesModel.findById(id);
+    const pdfStream = await generateprofilePDF(profile);
+    if (profile) {
+      res.setHeader("Content-Disposition", `attachment ; file-name=${profile._id}.pdf`);
+      pdfStream.pipe(res);
+      pdfStream.end();
+
+      const destination = res;
+      pipeline(pdfStream, destination, err => {
+        if(err){next(err)}
+      })
+    } else {
+      res.status(404).send(`profile with ${id} is not found!`);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 ////////////////////////////////
 ////////// experiences /////////
 ////////////////////////////////
