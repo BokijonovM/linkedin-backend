@@ -3,10 +3,10 @@ import fs from "fs-extra";
 
 const uploadImage = async (req, res, next) => {
   try {
-    const { _id, _userId } = req.params;
+    const { _id, id } = req.params;
 
     const updateExperience = await Profile.findOneAndUpdate(
-      { _id: _userId, "experiences._id": _id },
+      { _id: id, "experiences._id": _id },
       {
         $set: { "experiences.$.image": req.file.path },
       },
@@ -21,8 +21,33 @@ const uploadImage = async (req, res, next) => {
   }
 };
 
+const update = async (req, res, next) => {
+  try {
+    const { _id, id } = req.params;
+    await Profile.findOneAndUpdate(
+      { _id: id, "experiences._id": _id },
+      {
+        "experiences.$": {
+          ...req.body,
+          _id: _id,
+        },
+      }
+    );
+
+    const getUpdatedExperiences = await Profile.findOne(
+      { _id: id, "experiences._id": _id },
+      { "experiences.$": 1 }
+    );
+
+    res.send(getUpdatedExperiences.experiences[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const experience = {
   uploadImage: uploadImage,
+  update: update,
 };
 
 export default experience;

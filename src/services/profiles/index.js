@@ -125,38 +125,38 @@ profileRouter.get("/:id/experiences/:expId", async (req, res, next) => {
   }
 });
 
-profileRouter.put("/:id/experiences/:expId", async (req, res, next) => {
-  try {
-    const user = await ProfilesModel.findById(req.params.id);
-    if (user) {
-      const index = user.experiences.findIndex(
-        (book) => book._id.toString() === req.params.expId
-      );
+// profileRouter.put("/:id/experiences/:expId", async (req, res, next) => {
+//   try {
+//     const user = await ProfilesModel.findById(req.params.id);
+//     if (user) {
+//       const index = user.experiences.findIndex(
+//         (book) => book._id.toString() === req.params.expId
+//       );
 
-      if (index !== -1) {
-        user.experiences[index] = {
-          ...user.experiences[index].toObject(),
-          ...req.body,
-        };
+//       if (index !== -1) {
+//         user.experiences[index] = {
+//           ...user.experiences[index].toObject(),
+//           ...req.body,
+//         };
 
-        await user.save();
-        res.send(user);
-      } else {
-        next(
-          createHttpError(404, `Exp with id ${req.params.expId} not found!`)
-        );
-      }
-    } else {
-      next(createHttpError(404, `User with id ${req.params.id} not found!`));
-    }
-  } catch (error) {
-    next(
-      createHttpError(400, "Some errors occurred in profilerouter.get body!", {
-        message: error.message,
-      })
-    );
-  }
-});
+//         await user.save();
+//         res.send(user);
+//       } else {
+//         next(
+//           createHttpError(404, `Exp with id ${req.params.expId} not found!`)
+//         );
+//       }
+//     } else {
+//       next(createHttpError(404, `User with id ${req.params.id} not found!`));
+//     }
+//   } catch (error) {
+//     next(
+//       createHttpError(400, "Some errors occurred in profilerouter.get body!", {
+//         message: error.message,
+//       })
+//     );
+//   }
+// });
 
 profileRouter.delete("/:id/experiences/:expId", async (req, res, next) => {
   try {
@@ -221,10 +221,14 @@ profileRouter.get("/:id/experiences/:_id/CSV", async (req, res, next) => {
 });
 
 profileRouter
-  .route("/:_userId/experiences/:_id/image")
+  .route("/:id/experiences/:_id/image")
   .put(
     multer({ storage: lib.cloudStorage }).single("image"),
     experience.uploadImage
   );
+
+profileRouter
+  .route("/:id/experiences/:_id") // experienceId
+  .put(experience.update);
 
 export default profileRouter;
