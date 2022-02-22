@@ -45,6 +45,7 @@ const PostSchema = new Schema(
         author: { type: String, required: true },
         title: { type: String, required: true },
         text: { type: String, required: true },
+        user: { type: Schema.Types.ObjectId, ref: "Profile", required: true },
       },
     ],
     likes: [

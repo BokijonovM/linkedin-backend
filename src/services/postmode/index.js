@@ -72,6 +72,14 @@ postRouter.get("/", async (req, res, next) => {
         path: "user",
         select: ["_id", "firstName", "surName", "image"],
       })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          model: "Profile",
+          select: ["author", "title"],
+        },
+      })
       .sort(mongoQeury.options.sort)
       .skip(mongoQeury.options.skip)
       .limit(mongoQeury.limit);
