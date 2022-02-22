@@ -1,8 +1,6 @@
 import Profile from "./schema.js";
 import fs from "fs-extra";
 
-const { createReadStream, writeJSON } = fs;
-
 const uploadImage = async (req, res, next) => {
   try {
     const { _id, _userId } = req.params;

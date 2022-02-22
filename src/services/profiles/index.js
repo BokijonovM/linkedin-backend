@@ -2,8 +2,6 @@ import express from "express";
 import createHttpError from "http-errors";
 import ProfilesModel from "./schema.js";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import json2csv from "json2csv";
 import { join } from "path";
 import fs from "fs-extra";
@@ -12,15 +10,6 @@ import experience from "./exp.js";
 import lib from "../lib/index.js";
 
 const { createReadStream, writeJSON } = fs;
-
-const cloudinaryUploader = multer({
-  storage: new CloudinaryStorage({
-    cloudinary,
-    params: {
-      folder: "experience",
-    },
-  }),
-}).single("image");
 
 const profileRouter = express.Router();
 
@@ -237,40 +226,5 @@ profileRouter
     multer({ storage: lib.cloudStorage }).single("image"),
     experience.uploadImage
   );
-
-// profileRouter.post(
-//   "/:id/experiences/:expId/image",
-//   cloudinaryUploader,
-//   async (req, res, next) => {
-//     try {
-//       const experienceId = req.params.id;
-//       const updated = await ProfilesModel.findByIdAndUpdate(
-//         experienceId,
-//         { $push: { experiences: req.file.path } },
-//         //{ image: req.file.path },
-//         {
-//           new: true,
-//         }
-//       );
-//       if (updated) {
-//         res.send(updated);
-//       } else {
-//         next(
-//           createHttpError(404, `Experience with id ${experienceId} not found!`)
-//         );
-//       }
-//     } catch (error) {
-//       next(
-//         createHttpError(
-//           400,
-//           "Some errors occurred in profilerouter.get body!",
-//           {
-//             message: error.message,
-//           }
-//         )
-//       );
-//     }
-//   }
-// );
 
 export default profileRouter;
