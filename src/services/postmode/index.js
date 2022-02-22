@@ -68,6 +68,10 @@ postRouter.get("/", async (req, res, next) => {
     const total = await PostModel.countDocuments(mongoQeury.criteria);
 
     const posts = await PostModel.find(mongoQeury.criteria)
+      .populate({
+        path: "user",
+        select: ["_id", "firstName", "surName", "image"],
+      })
       .sort(mongoQeury.options.sort)
       .skip(mongoQeury.options.skip)
       .limit(mongoQeury.limit);

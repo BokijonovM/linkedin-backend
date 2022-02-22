@@ -28,7 +28,7 @@ const profileSchema = new Schema(
           required: true,
           dropDups: true,
         },
-        user: { type: Schema.Types.ObjectId, ref: "profile" },
+        user: { type: Schema.Types.ObjectId, ref: "Profile" },
         image: { type: String, required: true },
       },
       {
@@ -40,4 +40,4 @@ const profileSchema = new Schema(
     timestamps: true,
   }
 );
-export default model("profile", profileSchema);
+export default model("Profile", profileSchema);

@@ -29,21 +29,27 @@ const PostSchema = new Schema(
     text: { type: String, required: false },
     username: { type: String, required: true },
     image: { type: String, required: true },
-    user: {
-      name: { type: String, required: true },
-      surname: { type: String, required: true },
-      email: { type: String, required: true },
-      bio: { type: String, required: true },
-      title: { type: String, required: false },
-      area: { type: String, required: false },
-      image: { type: String, required: true },
-      username: { type: String, required: true },
-    },
+    user: { type: Schema.Types.ObjectId, ref: "Profile" },
+    // user: {
+    //   name: { type: String, required: true },
+    //   surname: { type: String, required: true },
+    //   email: { type: String, required: true },
+    //   bio: { type: String, required: true },
+    //   title: { type: String, required: false },
+    //   area: { type: String, required: false },
+    //   image: { type: String, required: true },
+    //   username: { type: String, required: true },
+    // },
     comments: [
       {
         author: { type: String, required: true },
         title: { type: String, required: true },
-        text: { type: String, required: true }
+        text: { type: String, required: true },
+      },
+    ],
+    likes: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "Profile", required: true },
       },
     ],
   },
