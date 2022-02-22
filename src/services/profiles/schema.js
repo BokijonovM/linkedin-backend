@@ -13,7 +13,7 @@ const profileSchema = new Schema(
     title: { type: String, required: true },
     area: { type: String, required: true },
     image: { type: String, required: true },
-    username: { type: String, required: true, unique: true, dropDups: true },
+    username: { type: String, required: true },
     experiences: [
       {
         role: { type: String, required: true },

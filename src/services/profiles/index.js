@@ -8,10 +8,19 @@ import fs from "fs-extra";
 import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const { createReadStream, writeJSON } = fs;
-
 const profileRouter = express.Router();
+const cloudinaryUpload = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "posts",
+    },
+  }),
+});
 
 profileRouter.get("/", async (req, res, next) => {
   try {
@@ -52,13 +61,32 @@ profileRouter.put("/:id", async (req, res, next) => {
     if (updatedProfile) {
       res.send(updatedProfile);
     } else {
-      next(createHttpError(404, `profile with id ${profileId} not found!`));
+      next(createHttpError(404, `profile with id ${id} not found!`));
     }
   } catch (error) {
     next(error);
   }
 });
-
+profileRouter.post(
+  "/:id/image",
+  cloudinaryUpload.single("image"),
+  async (req, res, next) => {
+    try {
+      const updatedProfile = await ProfilesModel.findByIdAndUpdate(
+        req.params.id,
+        { $push: { image: req.file.path } },
+        { new: true }
+      );
+      if (updatedProfile) {
+        res.status(200).send(updatedProfile);
+      } else {
+        next(createHttpError(404, `profile with given ${id} not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 ////////////////////////////////
 ////////// experiences /////////
 ////////////////////////////////
