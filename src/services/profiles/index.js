@@ -89,13 +89,13 @@ profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
 
 profileRouter.get("/:id/pdf", async (req, res, next) => {
   try {
-    const selectedBlogPost = await ProfilesModel.findById(req.params.id);
+    const selectedProfile = await ProfilesModel.findById(req.params.id);
     //create PDF readableStream
-    const source = await createPDFReadableStream(selectedBlogPost);
+    const source = await createPDFReadableStream(selectedProfile);
     // set header
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=${selectedBlogPost._id}.pdf`
+      `attachment; filename=${selectedProfile._id}.pdf`
     );
     // set destination
     const destination = res;
