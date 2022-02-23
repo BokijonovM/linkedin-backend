@@ -58,16 +58,13 @@ profileRouter.get("/:id", async (req, res, next) => {
     next(error);
   }
 });
-profileRouter.put("/:id", async (req, res, next) => {
+profileRouter.put("/", async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const updatedProfile = await ProfilesModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const updatedProfile = await ProfilesModel.findOneAndUpdate(req.body);
     if (updatedProfile) {
       res.send(updatedProfile);
     } else {
-      next(createHttpError(404, `profile with id ${id} not found!`));
+      next(createHttpError(404));
     }
   } catch (error) {
     next(error);
