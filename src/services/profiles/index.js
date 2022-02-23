@@ -8,24 +8,10 @@ import fs from "fs-extra";
 import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
-import path from "path";
-// import { generateprofilePDF } from "./cv.js";
-import { createPDFReadableStream } from "./cv.js";
-
-import { createGzip } from "zlib";
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const { createReadStream, writeJSON } = fs;
+
 const profileRouter = express.Router();
-const cloudinaryUpload = multer({
-  storage: new CloudinaryStorage({
-    cloudinary,
-    params: {
-      folder: "posts",
-    },
-  }),
-}).single("image");
 
 profileRouter.get("/", async (req, res, next) => {
   try {
@@ -35,14 +21,17 @@ profileRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
-
 profileRouter.post("/", async (req, res, next) => {
   try {
     const newProfile = new ProfilesModel(req.body);
     const { _id } = await newProfile.save();
     res.status(201).send({ _id });
   } catch (error) {
-    next(error);
+    next(
+      createHttpError(400, "Some errors occurred in profilerouter.get body!", {
+        message: error.message,
+      })
+    );
   }
 });
 profileRouter.get("/:id", async (req, res, next) => {
@@ -67,56 +56,10 @@ profileRouter.put("/:id", async (req, res, next) => {
     if (updatedProfile) {
       res.send(updatedProfile);
     } else {
-      next(createHttpError(404, `profile with id ${id} not found!`));
+      next(createHttpError(404, `profile with id ${profileId} not found!`));
     }
   } catch (error) {
     next(error);
-  }
-});
-profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
-  try {
-    const updatedProfile = await ProfilesModel.findByIdAndUpdate(
-      req.params.id,
-      { image: req.file.path },
-      { new: true }
-    );
-    if (updatedProfile) {
-      res.status(200).send(updatedProfile);
-    } else {
-      next(createHttpError(404, `profile with given ${id} not found`));
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-profileRouter.get("/:id/pdf", async (req, res, next) => {
-  try {
-    const selectedBlogPost = await ProfilesModel.findById(req.params.id);
-    //create PDF readableStream
-    const source = await createPDFReadableStream(selectedBlogPost);
-    // set header
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${selectedBlogPost._id}.pdf`
-    );
-    // set destination
-    const destination = res;
-    pipeline(source, destination, (err) => {
-      if (err) {
-        next(err);
-      }
-    });
-  } catch (error) {
-    next(
-      createHttpError(
-        400,
-        "Some errors occurred in profileRouter.post experiences body!",
-        {
-          message: error.message,
-        }
-      )
-    );
   }
 });
 
