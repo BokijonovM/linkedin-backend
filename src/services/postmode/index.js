@@ -64,16 +64,16 @@ postRouter.get("/", async (req, res, next) => {
     const posts = await PostModel.find(mongoQuery.criteria)
       .populate({
         path: "user",
-        select: ["_id", "firstName", "surName", "image"],
+        select: ["_id", "firstName", "surName", "image", "bio", "title"],
       })
-      .populate({
-        path: "comments",
-        populate: {
-          path: "user",
-          model: "Profile",
-          select: ["author", "title"],
-        },
-      })
+      // .populate({
+      //   path: "comments",
+      //   populate: {
+      //     path: "user",
+      //     model: "Profile",
+      //     select: ["author", "title"],
+      //   },
+      // })
       .sort(mongoQuery.options.sort)
       .skip(mongoQuery.options.skip)
       .limit(mongoQuery.limit);

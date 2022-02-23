@@ -27,19 +27,8 @@ const { Schema, model } = mongoose;
 const PostSchema = new Schema(
   {
     text: { type: String, required: false },
-    username: { type: String, required: true },
     image: { type: String, required: true },
-    user: [{ type: Schema.Types.ObjectId, ref: "Profile" }],
-    // user: {
-    //   name: { type: String, required: true },
-    //   surname: { type: String, required: true },
-    //   email: { type: String, required: true },
-    //   bio: { type: String, required: true },
-    //   title: { type: String, required: false },
-    //   area: { type: String, required: false },
-    //   image: { type: String, required: true },
-    //   username: { type: String, required: true },
-    // },
+    user: { type: Schema.Types.ObjectId, ref: "Profile" },
     comments: [
       {
         author: { type: String, required: true },
@@ -48,21 +37,16 @@ const PostSchema = new Schema(
         user: { type: Schema.Types.ObjectId, ref: "Profile", required: true },
       },
     ],
-    likes: [
-      {
-        userId: { type: Schema.Types.ObjectId, ref: "Profile", required: true },
-      },
-    ],
   },
   { timestamps: true }
 );
 
 PostSchema.static("findPostsWithUser", async function (mongoQuery) {
-  const total = await this.countDocuments(mongoQuery.criteria); // If I use a normal function (not an arrow) here, the "this" keyword will give me the possibility to access to BooksModel
+  const total = await this.countDocuments(mongoQuery.criteria);
   const posts = await this.find(mongoQuery.criteria)
     .limit(mongoQuery.options.limit)
     .skip(mongoQuery.options.skip)
-    .sort(mongoQuery.options.sort) // no matter in which order you call this options, Mongo will ALWAYS do SORT, SKIP, LIMIT in this order
+    .sort(mongoQuery.options.sort)
     .populate({
       path: "user",
       select: "firstName surName",
