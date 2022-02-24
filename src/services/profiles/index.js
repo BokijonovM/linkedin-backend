@@ -8,24 +8,22 @@ import fs from "fs-extra";
 import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
-import path from "path";
-// import { generateprofilePDF } from "./cv.js";
 import { createPDFReadableStream } from "./cv.js";
-
-import { createGzip } from "zlib";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const { createReadStream, writeJSON } = fs;
-const profileRouter = express.Router();
+
 const cloudinaryUpload = multer({
   storage: new CloudinaryStorage({
     cloudinary,
     params: {
-      folder: "posts",
+      folder: "experience",
     },
   }),
 }).single("image");
+
+const profileRouter = express.Router();
 
 profileRouter.get("/", async (req, res, next) => {
   try {
@@ -62,13 +60,20 @@ profileRouter.get("/:id", async (req, res, next) => {
     next(error);
   }
 });
-profileRouter.put("/", async (req, res, next) => {
+profileRouter.put("/:id", async (req, res, next) => {
   try {
-    const updatedProfile = await ProfilesModel.findOneAndUpdate(req.body);
-    if (updatedProfile) {
-      res.send(updatedProfile);
+    const userId = req.params.id;
+    const updatedUser = await ProfilesModel.findByIdAndUpdate(
+      userId,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (updatedUser) {
+      res.send(updatedUser);
     } else {
-      next(createHttpError(404));
+      next(createHttpError(404, `Profile with id ${userId} not found!`));
     }
   } catch (error) {
     next(error);
@@ -76,15 +81,18 @@ profileRouter.put("/", async (req, res, next) => {
 });
 profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
   try {
-    const updatedProfile = await ProfilesModel.findByIdAndUpdate(
-      req.params.id,
+    const userId = req.params.id;
+    const updated = await ProfilesModel.findByIdAndUpdate(
+      userId,
       { image: req.file.path },
-      { new: true }
+      {
+        new: true,
+      }
     );
-    if (updatedProfile) {
-      res.status(200).send(updatedProfile);
+    if (updated) {
+      res.send(updated);
     } else {
-      next(createHttpError(404, `profile with given ${id} not found`));
+      next(createHttpError(404, `Profile with id ${userId} not found!`));
     }
   } catch (error) {
     next(error);
