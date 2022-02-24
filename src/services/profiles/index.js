@@ -8,8 +8,20 @@ import fs from "fs-extra";
 import { pipeline } from "stream";
 import experience from "./exp.js";
 import lib from "../lib/index.js";
+import { createPDFReadableStream } from "./cv.js";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const { createReadStream, writeJSON } = fs;
+
+const cloudinaryUpload = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "experience",
+    },
+  }),
+}).single("image");
 
 const profileRouter = express.Router();
 
@@ -21,6 +33,7 @@ profileRouter.get("/", async (req, res, next) => {
     next(error);
   }
 });
+
 profileRouter.post("/", async (req, res, next) => {
   try {
     const newProfile = new ProfilesModel(req.body);
@@ -49,17 +62,70 @@ profileRouter.get("/:id", async (req, res, next) => {
 });
 profileRouter.put("/:id", async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const updatedProfile = await ProfilesModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    if (updatedProfile) {
-      res.send(updatedProfile);
+    const userId = req.params.id;
+    const updatedUser = await ProfilesModel.findByIdAndUpdate(
+      userId,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (updatedUser) {
+      res.send(updatedUser);
     } else {
-      next(createHttpError(404, `profile with id ${profileId} not found!`));
+      next(createHttpError(404, `Profile with id ${userId} not found!`));
     }
   } catch (error) {
     next(error);
+  }
+});
+profileRouter.post("/:id/image", cloudinaryUpload, async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const updated = await ProfilesModel.findByIdAndUpdate(
+      userId,
+      { image: req.file.path },
+      {
+        new: true,
+      }
+    );
+    if (updated) {
+      res.send(updated);
+    } else {
+      next(createHttpError(404, `Profile with id ${userId} not found!`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+profileRouter.get("/:id/pdf", async (req, res, next) => {
+  try {
+    const selectedProfile = await ProfilesModel.findById(req.params.id);
+    //create PDF readableStream
+    const source = await createPDFReadableStream(selectedProfile);
+    // set header
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${selectedProfile._id}.pdf`
+    );
+    // set destination
+    const destination = res;
+    pipeline(source, destination, (err) => {
+      if (err) {
+        next(err);
+      }
+    });
+  } catch (error) {
+    next(
+      createHttpError(
+        400,
+        "Some errors occurred in profileRouter.post experiences body!",
+        {
+          message: error.message,
+        }
+      )
+    );
   }
 });
 
