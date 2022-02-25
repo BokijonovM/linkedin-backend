@@ -8,7 +8,7 @@ npm i
 https://buildweek3-backend.herokuapp.com/profiles
 ```
 
-## POST product method requiremnts
+## POST profile method requiremnts (user info)
 ```jsx
 {
         "firstName": "",
