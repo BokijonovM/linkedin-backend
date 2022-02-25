@@ -63,8 +63,8 @@ https://buildweek3-backend.herokuapp.com/postMode
 ## POST profile method requiremnts (user info)
 ```jsx
 {
-                "text": "",
-                "image": "",
-                "user": "needed userId who is posting this post and other user details automatically add by server",
+  "text": "",
+  "image": "",
+  "user": "needed userId who is posting this post and other user details automatically add by server",
 }
 ```
