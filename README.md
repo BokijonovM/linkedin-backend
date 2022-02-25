@@ -54,3 +54,17 @@ https://buildweek3-backend.herokuapp.com/profiles/${profileId}/experiences/${exp
 * Image should be single
 * If you uploading with Postman form-data name should be "image" 
 
+
+## API for posts in news feed
+```jsx
+http://localhost:3001/postMode
+```
+
+## POST profile method requiremnts (user info)
+```jsx
+{
+                "text": "",
+                "image": "",
+                "user": "needed userId who is posting this post and other user details automatically add by server",
+}
+```
