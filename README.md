@@ -57,7 +57,7 @@ https://buildweek3-backend.herokuapp.com/profiles/${profileId}/experiences/${exp
 
 ## API for posts in news feed
 ```jsx
-http://localhost:3001/postMode
+https://buildweek3-backend.herokuapp.com/postMode
 ```
 
 ## POST profile method requiremnts (user info)
